@@ -1335,8 +1335,17 @@ static void *genera_create_instance(const char *module_dir, const char *config_j
 static void genera_destroy_instance(void *instance) {
     genera_instance_t *inst = (genera_instance_t *)instance;
     if (!inst) return;
-    /* Best-effort all notes off — but we have no output buffer here.
-     * The host should handle lingering notes via CC 123. */
+    /* Best-effort all notes off via host API (midi_fx has no output buffer in destroy) */
+    if (g_host && g_host->midi_send_internal) {
+        /* Send note-off for all tracked active notes */
+        for (int i = 0; i < inst->active_count; i++) {
+            uint8_t msg[4] = { 0x08, 0x80, inst->active_notes[i].note, 0 };
+            g_host->midi_send_internal(msg, 4);
+        }
+        /* CC 123 = All Notes Off */
+        uint8_t cc_msg[4] = { 0x0B, 0xB0, 123, 0 };
+        g_host->midi_send_internal(cc_msg, 4);
+    }
     free(inst);
 }
 
