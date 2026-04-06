@@ -141,6 +141,34 @@ static int appendf(char *buf, int buf_len, int *pos, const char *fmt, ...) {
     return 1;
 }
 
+/* ── Minimal JSON helpers (no external lib) ── */
+
+static int json_get_int(const char *json, const char *key, int *out) {
+    char search[64];
+    snprintf(search, sizeof(search), "\"%s\":", key);
+    const char *p = strstr(json, search);
+    if (!p) return -1;
+    p += strlen(search);
+    while (*p == ' ' || *p == '\t') p++;
+    *out = atoi(p);
+    return 0;
+}
+
+static int json_get_str(const char *json, const char *key, char *out, int out_len) {
+    char search[64];
+    snprintf(search, sizeof(search), "\"%s\":\"", key);
+    const char *p = strstr(json, search);
+    if (!p) return -1;
+    p += strlen(search);
+    const char *end = strchr(p, '"');
+    if (!end) return -1;
+    int len = (int)(end - p);
+    if (len >= out_len) len = out_len - 1;
+    memcpy(out, p, (size_t)len);
+    out[len] = '\0';
+    return 0;
+}
+
 /* Seeded LCG — deterministic, no rand() */
 static uint32_t lcg_next(uint32_t *state) {
     *state = *state * 1664525u + 1013904223u;
@@ -1325,10 +1353,68 @@ static void *genera_create_instance(const char *module_dir, const char *config_j
     inst->clocks_per_step = 24;  /* 1/4 note = 24/1 = 24 clocks */
 
     recalc_clock_timing(inst);
+
+    /* ── Restore saved state from config_json ── */
+    if (config_json) {
+        char sbuf[32];
+        int iv;
+
+        if (json_get_str(config_json, "root", sbuf, sizeof(sbuf)) == 0) {
+            int idx = find_enum_index(sbuf, g_root_names, NUM_ROOTS);
+            if (idx >= 0) inst->root = idx;
+        }
+        if (json_get_str(config_json, "scale", sbuf, sizeof(sbuf)) == 0) {
+            int idx = find_scale_index(sbuf);
+            if (idx >= 0) inst->scale = idx;
+        }
+        if (json_get_str(config_json, "gen_mode", sbuf, sizeof(sbuf)) == 0) {
+            int idx = find_enum_index(sbuf, g_gen_mode_names, NUM_GEN_MODES);
+            if (idx >= 0) inst->gen_mode = (gen_mode_t)idx;
+        }
+        if (json_get_int(config_json, "steps", &iv) == 0)
+            inst->steps = clamp_int(iv, 1, MAX_STEPS);
+        if (json_get_int(config_json, "capture", &iv) == 0)
+            inst->capture = clamp_int(iv, 0, MAX_STEPS);
+        if (json_get_int(config_json, "evolve", &iv) == 0)
+            inst->evolve = clamp_int(iv, 0, 100);
+        if (json_get_int(config_json, "stutter", &iv) == 0)
+            inst->stutter = clamp_int(iv, 0, 100);
+        if (json_get_int(config_json, "octaves", &iv) == 0)
+            inst->octaves = clamp_int(iv, 0, 100);
+        if (json_get_int(config_json, "chord", &iv) == 0)
+            inst->chord = clamp_int(iv, 0, 100);
+        if (json_get_str(config_json, "sync", sbuf, sizeof(sbuf)) == 0) {
+            int idx = find_enum_index(sbuf, g_sync_names, 2);
+            if (idx >= 0) inst->sync_mode = (sync_mode_t)idx;
+        }
+        if (json_get_int(config_json, "tempo", &iv) == 0)
+            inst->tempo = clamp_int(iv, 20, 500);
+        if (json_get_str(config_json, "division", sbuf, sizeof(sbuf)) == 0) {
+            int idx = find_division_index(sbuf);
+            if (idx >= 0) inst->division = idx;
+        }
+        if (json_get_str(config_json, "vel_mode", sbuf, sizeof(sbuf)) == 0) {
+            int idx = find_enum_index(sbuf, g_vel_mode_names, 4);
+            if (idx >= 0) inst->vel_mode = (vel_mode_t)idx;
+        }
+        if (json_get_int(config_json, "velocity", &iv) == 0)
+            inst->velocity = clamp_int(iv, 0, 127);
+        if (json_get_int(config_json, "gate", &iv) == 0)
+            inst->gate = clamp_int(iv, 1, 200);
+        if (json_get_str(config_json, "stut_mode", sbuf, sizeof(sbuf)) == 0) {
+            int idx = find_enum_index(sbuf, g_stut_mode_names, 2);
+            if (idx >= 0) inst->stutter_mode = (stutter_mode_t)idx;
+        }
+        if (json_get_int(config_json, "humanize", &iv) == 0)
+            inst->humanize = clamp_int(iv, 0, 100);
+
+        inst->timing_dirty = 1;
+        recalc_clock_timing(inst);
+    }
+
     build_chain_params(inst);
 
     (void)module_dir;
-    (void)config_json;
     return inst;
 }
 

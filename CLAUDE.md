@@ -32,6 +32,12 @@ a chaotic stutter engine with beat-repeat, octave variation, humanize, and captu
 ./install.sh         # Deploy to Move via SSH
 ```
 
+## State Persistence
+- `get_param("state")` serializes all 17 params to JSON
+- `create_instance(config_json)` restores from that JSON on reload
+- Uses lightweight `json_get_int` / `json_get_str` helpers (strstr-based, no lib)
+- Host calls get_param("state") on shutdown, passes result as config_json on next boot
+
 ## Invariants
 - Never use rand() — seeded LCG only (rng_state for main, stutter_rng for stutter)
 - Never allocate in tick() or process_midi()
