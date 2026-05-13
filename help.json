@@ -1,0 +1,124 @@
+{
+  "title": "Genera",
+  "children": [
+    {
+      "title": "About",
+      "lines": [
+        "Generative note &",
+        "chord sequencer.",
+        "MIDI FX.",
+        "",
+        "7 generation modes,",
+        "stutter engine with",
+        "beat-repeat, 20",
+        "scales, chord",
+        "stacking, capture/",
+        "loop & humanize.",
+        "",
+        "Feeds notes downstream",
+        "to any synth or",
+        "sampler in the chain."
+      ]
+    },
+    {
+      "title": "Page: Genera",
+      "lines": [
+        "K1 Root",
+        "    note pool root",
+        "K2 Division",
+        "    1/4, 1/8, 1/16,",
+        "    triplets etc.",
+        "K3 Steps",
+        "    pattern length",
+        "K4 Capture",
+        "    snapshot the",
+        "    current generative",
+        "    output into a loop",
+        "K5 Evolve",
+        "    mutation per cycle",
+        "K6 Stutter",
+        "    beat-repeat depth",
+        "    on random hits",
+        "K7 Octaves",
+        "    note spread",
+        "K8 Chord",
+        "    stacking depth",
+        "    1 = mono, 2+ =",
+        "    chord on each step"
+      ]
+    },
+    {
+      "title": "Page: Sync",
+      "lines": [
+        "K1 Sync",
+        "    Free / Host",
+        "K2 Tempo BPM",
+        "    Free mode only",
+        "K3 Division",
+        "    mirror of Genera",
+        "K4 Vel Mode",
+        "    fixed / random /",
+        "    accent-pattern",
+        "K5 Velocity",
+        "    base velocity",
+        "K6 Gate",
+        "    note length",
+        "    relative to step",
+        "K7 Stut Mode",
+        "    independent",
+        "    stutter timing",
+        "K8 Humanize",
+        "    timing jitter"
+      ]
+    },
+    {
+      "title": "Generation modes",
+      "lines": [
+        "Selected via menu",
+        "or set_param('mode'):",
+        "",
+        " Random",
+        "  pick scale tone",
+        " Walk",
+        "  +/- step within",
+        "  scale",
+        " Arp",
+        "  cycle scale",
+        " Markov",
+        "  weighted transit.",
+        " Euclidean",
+        "  Bjorklund pattern",
+        " Generative",
+        "  rule-based",
+        " Capture",
+        "  playback of the",
+        "  Captured loop"
+      ]
+    },
+    {
+      "title": "Tips",
+      "lines": [
+        "Evolve low + Capture",
+        " a phrase you like:",
+        " loop locks while",
+        " texture gently",
+        " mutates over time.",
+        "",
+        "Chord = 3 + Walk mode",
+        " + minor scale: slow",
+        " jazz arpeggio with",
+        " evolving voicings.",
+        "",
+        "Stutter under 20% =",
+        " subtle ghost notes.",
+        " Past 50% = chaotic",
+        " glitch fills.",
+        "",
+        "Pair with Weird Dreams",
+        " or KrautDrums for",
+        " infinite generative",
+        " drum patterns."
+      ]
+    }
+  ]
+}
